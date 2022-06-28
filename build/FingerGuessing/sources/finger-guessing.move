@@ -89,16 +89,13 @@ module GameShowdown {
         // can't all in @admin balance  max only   1/10  every times
         assert!(Token::value<TokenType>(&borrow_global<Bank<TokenType>>(@admin).bank) >= amount * 10, 2);
 
-        let player = getFingerGuessResult();
-        let robot = getFingerGuessResult();
-        let result = 0;
-        if (player != robot) {
-            if ((player == 0 && robot == 2) || (player == 1 && robot == 0) || (player == 2 && robot == 1)) {
-                result = 1;
-                win_token<TokenType>(account, amount)
+        let result = getFingerGuessResult();
+
+        if (input != result) {
+            if ((input == 0 && result == 2) || (input == 1 && result == 0) || (input == 2 && result == 1)) {
+                win_token<TokenType>(account, amount);
             } else {
-                result = 2;
-                loss_token<TokenType>(account, amount)
+                loss_token<TokenType>(account, amount);
             }
         };
 

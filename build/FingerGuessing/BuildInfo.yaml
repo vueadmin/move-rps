@@ -320,7 +320,7 @@ compiled_package_info:
     ? address: "0x6ee3f577c8da207830c31e1f0abb4244"
       name: Vesting
     : SFC
-  source_digest: 3E6F10CF77D35DA6F560B4745AFF51D886B53BE036EF0D1E9004EEF3E23EB38D
+  source_digest: 20AFF0C0F9F54DED09E3FE6199825DA6BC28AE9BEA88005FE66D70E4DB89AB58
   build_flags:
     dev_mode: false
     test_mode: false
