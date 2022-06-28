@@ -12,8 +12,8 @@ module GameShowdown {
 
     struct CheckEvent has store, drop {
         amount: u128,
-        result: u64,
-        input: u64,
+        result: u8,
+        input: u8,
         token_type: Token::TokenCode
     }
 
@@ -75,12 +75,12 @@ module GameShowdown {
     }
 
     /// get result for this
-    fun getFingerGuessResult(): u64 {
-        PseudoRandom::rand_u64(&@admin) % 3
+    fun getFingerGuessResult(): u8 {
+        ((PseudoRandom::rand_u64(&@admin) % 3) as u8)
     }
 
     /// check game result
-    public(script) fun check<TokenType: store>(account: signer, amount: u128, input: u64) acquires Bank, BankEvent {
+    public(script) fun check<TokenType: store>(account: signer, amount: u128, input: u8) acquires Bank, BankEvent {
         let signer_addr = Signer::address_of(&account);
 
         //  check account amount

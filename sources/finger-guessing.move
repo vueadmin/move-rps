@@ -76,7 +76,7 @@ module GameShowdown {
 
     /// get result for this
     fun getFingerGuessResult(): u8 {
-        (PseudoRandom::rand_u64(&@admin) % 3) as u8
+        ((PseudoRandom::rand_u64(&@admin) % 3) as u8)
     }
 
     /// check game result
