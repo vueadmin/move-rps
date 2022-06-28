@@ -21,7 +21,6 @@ module GameFingerGuessing {
         check_event: Event::EventHandle<CheckEvent>,
     }
 
-    /// @admin init bank 管理员初始化银行
     public(script) fun init_bank<TokenType: store>(signer: signer, amount: u128) {
         let account = &signer;
         let signer_addr = Signer::address_of(account);
@@ -40,7 +39,6 @@ module GameFingerGuessing {
         });
     }
 
-    /// @admin withdraw from bank 管理员从银行提款
     public(script) fun withdraw<TokenType: store>(signer: signer, amount: u128) acquires Bank {
         let signer_addr = Signer::address_of(&signer);
 
@@ -52,7 +50,6 @@ module GameFingerGuessing {
         Account::deposit<TokenType>(signer_addr, token);
     }
 
-    /// everyone can deposit amount to bank 任何人从银行中提款
     public(script) fun deposit<TokenType: store>(signer: signer, amount: u128)  acquires Bank {
         assert!(exists<Bank<TokenType>>(@admin), 10004);
 
@@ -61,53 +58,41 @@ module GameFingerGuessing {
         Token::deposit<TokenType>(&mut bank.bank, token);
     }
 
-    // 玩家赢
     fun win_token<TokenType: store>(signer: signer, amount: u128) acquires Bank {
         let bank = borrow_global_mut<Bank<TokenType>>(@admin);
         let token = Token::withdraw<TokenType>(&mut bank.bank, amount);
         Account::deposit<TokenType>(Signer::address_of(&signer), token);
     }
 
-    // 玩家输
     fun loss_token<TokenType: store>(signer: signer, amount: u128) acquires Bank {
         let token = Account::withdraw<TokenType>(&signer, amount);
         let bank = borrow_global_mut<Bank<TokenType>>(@admin);
         Token::deposit<TokenType>(&mut bank.bank, token);
     }
 
-    // 从 0 1 2 中随机获取一个数
     fun getRandBool(): bool {
         PseudoRandom::rand_u64(&@admin) % 3
     }
 
-    // check game result 获得游戏结果
-    // 参与金额在DAPP调用的时候直接写好固定值 1 
     public(script) fun check<TokenType: store>(account: signer, amount: u128, input: bool) acquires Bank, BankEvent {
         let signer_addr = Signer::address_of(&account);
 
-        //  check account amount
         assert!(Account::balance<TokenType>(signer_addr) > amount, 1);
 
-        // can't all in @admin balance  max only   1/10  every times
         assert!(Token::value<TokenType>(&borrow_global<Bank<TokenType>>(@admin).bank) >= amount * 10, 2);
 
-        // 0 => 剪刀
-        // 1 => 石头
-        // 2 => 布
         let player = getRandBool();
         let robot = getRandBool();
 
-        let result = player - robot;
+        let result = 0;
 
-        if (result == 1 || result == -2) {
+        if ((player == 0 && robot == 2) || (player == 1 && robot == 0) || (player == 2 && robot == 1)) {
             win_token<TokenType>(_account, amount)
-        } else if (result == -1 || result == 2) {
+        } else {
             loss_token<TokenType>(_account, amount)
         }
 
-
-        // event
-        let bank_event = borrow_global_mut<BankEvent<TokenType>>(@admin);
+        let bank_event = borrow_global_mut<BankEvent<TokenType>>(@admin)
         Event::emit_event(&mut bank_event.check_event, CheckEvent{
             amount,
             result,
