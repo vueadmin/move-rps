@@ -1,5 +1,5 @@
 address admin {
-module GameShowdown {
+module GameFingerGuessing {
     use StarcoinFramework::Account;
     use StarcoinFramework::Signer;
     use StarcoinFramework::Token;
@@ -80,7 +80,8 @@ module GameShowdown {
         PseudoRandom::rand_u64(&@admin) % 3
     }
 
-    /// check game result 获得游戏结果
+    // check game result 获得游戏结果
+    // 参与金额在DAPP调用的时候直接写好固定值 1 
     public(script) fun check<TokenType: store>(account: signer, amount: u128, input: bool) acquires Bank, BankEvent {
         let signer_addr = Signer::address_of(&account);
 
@@ -96,17 +97,14 @@ module GameShowdown {
         let player = getRandBool();
         let robot = getRandBool();
 
-        if (robot == player) {
-            // 这个地方需要把钱从银行中返回到玩家原地址
-        } else {
-            // [0-2, 1-0, 2-1] player win
+        let result = player - robot;
 
-            if (player == 0 && robot == 2 || player == 1 && robot == 0 || player == 2 && robot == 1) {
-                win_token<TokenType>(account, amount)
-            } else {
-                loss_token<TokenType>(account, amount)
-            }
+        if (result == 1 || result == -2) {
+            win_token<TokenType>(_account, amount)
+        } else if (result == -1 || result == 2) {
+            loss_token<TokenType>(_account, amount)
         }
+
 
         // event
         let bank_event = borrow_global_mut<BankEvent<TokenType>>(@admin);
