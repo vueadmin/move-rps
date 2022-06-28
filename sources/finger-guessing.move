@@ -86,7 +86,7 @@ module GameShowdown {
         //  check account amount
         assert!(Account::balance<TokenType>(signer_addr) > amount, 1);
 
-        assert!(input > 3 ,3);
+        assert!(input > 2 ,3);
 
         // can't all in @admin balance  max only   1/10  every times
         assert!(Token::value<TokenType>(&borrow_global<Bank<TokenType>>(@admin).bank) >= amount * 10, 2);
